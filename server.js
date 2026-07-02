@@ -190,7 +190,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const nodemailer = require("nodemailer");
+const { Resend } = require("resend");
+const resend = new Resend(process.env.RESEND_API_KEY);
 require("dotenv").config();
 
 const app = express();
@@ -246,7 +247,7 @@ app.post("/enquiry", async (req, res) => {
   try {
     await Enquiry.create(req.body);
 
-    await transporter.sendMail({
+    await resend.emails.send({
       from: `"Skyvora Trips" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       replyTo: req.body.email,
