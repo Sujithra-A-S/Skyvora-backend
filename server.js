@@ -3,11 +3,28 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
+
 const app = express();
 
-app.use(cors());
-app.options("/enquiry",cors());
+app.use(cors({
+  origin: "*",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
+
 app.use(express.json());
+
+app.options("/enquiry", (req, res) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  return res.sendStatus(204);
+});
+
+app.get("/", (req, res) => {
+  res.send("Backend working");
+});
+
 
 // MongoDB Connection
 mongoose.connect(process.env.MONGODB_URI)
@@ -75,7 +92,7 @@ app.post("/enquiry", async (req, res) => {
     });
   }
 });
-const PORT = process.env.PORT ||5000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log('Server running on port ${PORT}');
 });
