@@ -100,6 +100,8 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const nodemailer = require("nodemailer");
+const dns = require("dns");
+dns.setDefaultResultOrder("ipv4first");
 require("dotenv").config();
 
 const app = express();
@@ -156,7 +158,7 @@ app.post("/enquiry", async (req, res) => {
     await Enquiry.create(req.body);
     
     await transporter.sendMail({
-      from: "Skyvora Trips <{process.env.EMAIL_USER}>",
+      from: "Skyvora Trips <${process.env.EMAIL_USER}>",
       to: process.env.EMAIL_USER,
       replyTo: req.body.email,
       subject: "New Travel Enquiry",
@@ -178,7 +180,7 @@ app.post("/enquiry", async (req, res) => {
   } 
   catch (err) {
     console.error("Enquiry Error:", err.message);
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: "Failed to send enquiry email" });
   }
 });
 
