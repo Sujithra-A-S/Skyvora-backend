@@ -2,14 +2,21 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const nodemailer = require("nodemailer");
-
+require("dotenv").config();
 const app = express();
 
-app.use(cors());
+app.use(cors({
+   origin: [
+    "http://localhost:4200",
+    "https://skyvoratravels.vercel.app"
+  ],
+  methods: ["GET", "POST"],
+  allowedHeaders: ["Content-Type"]
+}));
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect("mongodb://localhost:27017/Skyvora")
+mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log("MongoDB Connected"))
 .catch(err => console.log(err));
 
