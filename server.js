@@ -190,9 +190,12 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const { Resend } = require("resend");
-const resend = new Resend(process.env.RESEND_API_KEY);
 require("dotenv").config();
+
+const { Resend } = require("resend");
+const resend = new 
+Resend(process.env.RESEND_API_KEY);
+
 
 const app = express();
 
@@ -202,7 +205,11 @@ app.use(cors({
   allowedHeaders: ["Content-Type"]
 }));
 
-app.options("/enquiry", cors());
+app.options("/enquiry", cors({
+  origin: "https://skyvoratravels.vercel.app",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"]
+}));
 
 app.use(express.json());
 
