@@ -189,20 +189,19 @@
 
 const express = require("express");
 const mongoose = require("mongoose");
-const nodemailer = require("nodemailer");
-const dns = require("dns");
 const cors = require("cors");
+const nodemailer = require("nodemailer");
 require("dotenv").config();
-
-dns.setDefaultResultOrder("ipv4first");
 
 const app = express();
 
 app.use(cors({
-  origin: "[skyvoratravels.vercel.app](https://skyvoratravels.vercel.app)",
+  origin: "https://skyvoratravels.vercel.app",
   methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
+  allowedHeaders: ["Content-Type"]
 }));
+
+app.options("/enquiry", cors());
 
 app.use(express.json());
 
@@ -210,113 +209,69 @@ app.get("/", (req, res) => {
   res.send("Backend working");
 });
 
-mongoose.connect(process.env.MONGODB_URI, {
-  serverSelectionTimeoutMS: 30000,
-})
+mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.error("MongoDB Error:", err));
+  .catch(err => console.error("MongoDB Error:", err));
 
 const enquirySchema = new mongoose.Schema({
-  name: { type: String, required: true, trim: true },
-  city: { type: String, required: true, trim: true },
-  email: { type: String, required: true, trim: true },
-  phone: { type: String, required: true, trim: true },
-  whatsapp: { type: String, trim: true, default: "" },
-  destination: { type: String, required: true, trim: true },
-  date: { type: String, required: true, trim: true },
-  people: { type: String, required: true, trim: true },
-}, { timestamps: true });
+  name: String,
+  city: String,
+  email: String,
+  phone: String,
+  whatsapp: String,
+  destination: String,
+  date: String,
+  people: String
+});
 
 const Enquiry = mongoose.model("Enquiry", enquirySchema);
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port:587,
+  port: 587,
   secure: false,
-  requireTLS:true,
+  requireTLS: true,
   family: 4,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
+    pass: process.env.EMAIL_PASS
   },
-});
-
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("Mail transporter error:", error);
-  } else {
-    console.log("Mail transporter is ready");
+  tls: {
+    servername: "smtp.gmail.com",
+    rejectUnauthorized: false
   }
 });
 
-function escapeHtml(str = "") {
-  return String(str)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
 app.post("/enquiry", async (req, res) => {
   try {
-    const {
-      name,
-      city,
-      email,
-      phone,
-      whatsapp,
-      destination,
-      date,
-      people
-    } = req.body;
-
-    if (!name || !city || !email || !phone || !destination || !date || !people) {
-      return res.status(400).json({ message: "All required fields must be filled" });
-    }
-
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return res.status(400).json({ message: "Invalid email address" });
-    }
-
-    const enquiryData = {
-      name: name.trim(),
-      city: city.trim(),
-      email: email.trim(),
-      phone: phone.trim(),
-      whatsapp: (whatsapp || "").trim(),
-      destination: destination.trim(),
-      date: date.trim(),
-      people: people.trim(),
-    };
-
-    await Enquiry.create(enquiryData);
+    await Enquiry.create(req.body);
 
     await transporter.sendMail({
-      from: `Skyvora Trips <${process.env.EMAIL_USER}>`,
+      from: `"Skyvora Trips" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
-      replyTo: enquiryData.email,
+      replyTo: req.body.email,
       subject: "New Travel Enquiry",
       html: `
-        <h2>New Enquiry Received</h2>
-        <p><b>Name:</b> ${escapeHtml(enquiryData.name)}</p>
-        <p><b>City:</b> ${escapeHtml(enquiryData.city)}</p>
-        <p><b>Email:</b> ${escapeHtml(enquiryData.email)}</p>
-        <p><b>Phone:</b> ${escapeHtml(enquiryData.phone)}</p>
-        <p><b>WhatsApp:</b> ${escapeHtml(enquiryData.whatsapp)}</p>
-        <p><b>Destination:</b> ${escapeHtml(enquiryData.destination)}</p>
-        <p><b>Date:</b> ${escapeHtml(enquiryData.date)}</p>
-        <p><b>People:</b> ${escapeHtml(enquiryData.people)}</p>
-      `,
+        <h2>New Travel Enquiry</h2>
+        <p><b>Name:</b> ${req.body.name}</p>
+        <p><b>City:</b> ${req.body.city}</p>
+        <p><b>Email:</b> ${req.body.email}</p>
+        <p><b>Phone:</b> ${req.body.phone}</p>
+        <p><b>WhatsApp:</b> ${req.body.whatsapp}</p>
+        <p><b>Destination:</b> ${req.body.destination}</p>
+        <p><b>Date:</b> ${req.body.date}</p>
+        <p><b>People:</b> ${req.body.people}</p>
+      `
     });
 
-    return res.status(200).json({ message: "Enquiry saved and mail sent" });
+    res.status(200).json({
+      message: "Enquiry submitted successfully. Mail sent to owner."
+    });
+
   } catch (err) {
-    console.error("Enquiry Error Full:", err);
-    return res.status(500).json({
-      message: "Failed to save enquiry or send email",
-      error: err.message,
+    console.error("Enquiry Error:", err);
+    res.status(500).json({
+      message: err.message
     });
   }
 });
@@ -326,4 +281,3 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
