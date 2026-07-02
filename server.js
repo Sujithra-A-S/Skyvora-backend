@@ -255,7 +255,7 @@ app.post("/enquiry", async (req, res) => {
     console.log("BODY:",req.body);
     await Enquiry.create(req.body);
     console.log("Database Saved")
-    await resend.emails.send({
+    const data = await resend.emails.send({
       from: `"Skyvora Trips" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       replyTo: req.body.email,
