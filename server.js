@@ -10,9 +10,10 @@ app.use(cors({
     "http://localhost:4200",
     "https://skyvoratravels.vercel.app"
   ],
-  methods: ["GET", "POST"],
+  methods: ["GET", "POST","OPTIONS"],
   allowedHeaders: ["Content-Type"]
 }));
+app.options("*",cors())
 app.use(express.json());
 
 // MongoDB Connection
