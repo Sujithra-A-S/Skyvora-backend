@@ -5,15 +5,8 @@ const nodemailer = require("nodemailer");
 require("dotenv").config();
 const app = express();
 
-app.use(cors({
-   origin: [
-    "http://localhost:4200",
-    "https://skyvoratravels.vercel.app"
-  ],
-  methods: ["GET", "POST","OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
-app.options("*",cors())
+app.use(cors());
+
 app.use(express.json());
 
 // MongoDB Connection
