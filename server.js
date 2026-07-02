@@ -106,17 +106,14 @@ require("dotenv").config();
 
 const app = express();
 
-app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "https://skyvoratravels.vercel.app");
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
-  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+const cors = require("cors");
 
-  if (req.method === "OPTIONS") {
-    return res.status(200).end();
-  }
+app.use(cors({
+  origin: "https://skyvoratravels.vercel.app",
+  methods: ["GET", "POST", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+}));
 
-  next();
-});
 
 app.use(express.json());
 
