@@ -142,8 +142,8 @@ const Enquiry = mongoose.model("Enquiry", enquirySchema);
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "skyvoratrips@gmail.com",
-    pass: "jlvn ocue bxub tiua"
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   }
 });
 
