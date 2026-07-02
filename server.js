@@ -258,7 +258,7 @@ app.post("/enquiry", async (req, res) => {
     const data = await resend.emails.send({
       from: `"Skyvora Trips" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
-      replyTo: req.body.email,
+      // replyTo: req.body.email,
       subject: "New Travel Enquiry",
       html: `
         <h2>New Travel Enquiry</h2>
