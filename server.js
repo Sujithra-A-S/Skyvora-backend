@@ -99,17 +99,22 @@
 
 const express = require("express");
 const mongoose = require("mongoose");
-const cors = require("cors");
 const nodemailer = require("nodemailer");
 require("dotenv").config();
 
 const app = express();
 
-app.use(cors({
-  origin: ["https://skyvoratravels.vercel.app"],
-  methods: ["GET", "POST", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "https://skyvoratravels.vercel.app");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
+  if (req.method === "OPTIONS") {
+    return res.status(200).end();
+  }
+
+  next();
+});
 
 app.use(express.json());
 
@@ -119,7 +124,7 @@ app.get("/", (req, res) => {
 
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("MongoDB Connected"))
-  .catch((err) => console.log(err));
+  .catch((err) => console.log("MongoDB Error:", err));
 
 const enquirySchema = new mongoose.Schema({
   name: String,
@@ -129,8 +134,7 @@ const enquirySchema = new mongoose.Schema({
   whatsapp: String,
   destination: String,
   date: String,
-  people: String,
-  vacation: String
+  people: String
 });
 
 const Enquiry = mongoose.model("Enquiry", enquirySchema);
@@ -145,8 +149,7 @@ const transporter = nodemailer.createTransport({
 
 app.post("/enquiry", async (req, res) => {
   try {
-    const enquiry = new Enquiry(req.body);
-    await enquiry.save();
+    await Enquiry.create(req.body);
 
     await transporter.sendMail({
       from: "Skyvora Trips <skyvoratrips@gmail.com>",
@@ -166,10 +169,9 @@ app.post("/enquiry", async (req, res) => {
       `
     });
 
-    res.status(200).json({ message: "Enquiry Saved Successfully" });
-
+    res.status(200).json({ message: "Enquiry saved and mail sent" });
   } catch (err) {
-    console.log(err);
+    console.log("Enquiry Error:", err);
     res.status(500).json({ message: "Something went wrong" });
   }
 });
