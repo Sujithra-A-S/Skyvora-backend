@@ -272,12 +272,15 @@ app.post("/enquiry", async (req, res) => {
         <p><b>People:</b> ${req.body.people}</p>
       `
     });
+    console.log("mail sent:",data);
+  
 
+    
     res.status(200).json({
       message: "Enquiry submitted successfully. Mail sent to owner."
     });
 
-  } catch (err) {
+  }catch (err) {
     console.error("Enquiry Error:", err);
     res.status(500).json({
       message: err.message
