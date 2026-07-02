@@ -143,14 +143,16 @@ const Enquiry = mongoose.model("Enquiry", enquirySchema);
 
 const transporter = nodemailer.createTransport({
   host:"smtp.gmail.com",
-  port: 587,
-  secure:false,
+  port: 465,
+  secure:true,
   service: "gmail",
   family: 4,
   auth: {
     user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    pass: process.env.EMAIL_PASS,
   },
+   tls: { rejectUnauthorized: true },
+  connectionTimeout: 10000, // 10 seconds
 });
 
 app.post("/enquiry", async (req, res) => {
@@ -158,7 +160,7 @@ app.post("/enquiry", async (req, res) => {
     await Enquiry.create(req.body);
     
     await transporter.sendMail({
-      from: "Skyvora Trips <${process.env.EMAIL_USER}>",
+      from: `Skyvora Trips <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
       replyTo: req.body.email,
       subject: "New Travel Enquiry",
