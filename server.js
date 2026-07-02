@@ -252,8 +252,9 @@ const Enquiry = mongoose.model("Enquiry", enquirySchema);
 
 app.post("/enquiry", async (req, res) => {
   try {
+    console.log("BODY:",req.body);
     await Enquiry.create(req.body);
-
+    console.log("Database Saved")
     await resend.emails.send({
       from: `"Skyvora Trips" <${process.env.EMAIL_USER}>`,
       to: process.env.EMAIL_USER,
