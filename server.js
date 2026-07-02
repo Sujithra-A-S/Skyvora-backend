@@ -257,8 +257,8 @@ app.post("/enquiry", async (req, res) => {
     console.log("Database Saved")
     const data = await resend.emails.send({
       from: `"Skyvora Trips" <onboarding@resend.dev>`,
-      to: process.env.EMAIL_USER,
-      replyTo: req.body.email,
+       to:"sujithraas04@gmail.com" ,
+      replyTo: undefined,
       subject: "New Travel Enquiry",
       html: `
         <h2>New Travel Enquiry</h2>
@@ -293,3 +293,8 @@ const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+
+
+// to: process.env.EMAIL_USER,
+// replyTo: req.body.email,
