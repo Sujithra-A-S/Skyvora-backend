@@ -140,26 +140,24 @@ const enquirySchema = new mongoose.Schema({
 const Enquiry = mongoose.model("Enquiry", enquirySchema);
 
 const transporter = nodemailer.createTransport({
-  
+  host:"smtp.gmail.com",
   port: 587,
   secure:false,
   service: "gmail",
+  family: 4,
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS
   },
-  tls :{
-    rejectUnauthorized:false
-  }
 });
 
 app.post("/enquiry", async (req, res) => {
   try {
     await Enquiry.create(req.body);
-    console.log("Saved to MongoDB")
+    
     await transporter.sendMail({
       from: "Skyvora Trips <{process.env.EMAIL_USER}>",
-      to: "skyvoratrips@gmail.com",
+      to: process.env.EMAIL_USER,
       replyTo: req.body.email,
       subject: "New Travel Enquiry",
       html: `
@@ -174,7 +172,7 @@ app.post("/enquiry", async (req, res) => {
         <p><b>People:</b> ${req.body.people}</p>
       `
     });
-    console.log("Mail Sent")
+    
 
     res.status(200).json({ message: "Enquiry saved and mail sent" });
   } 
