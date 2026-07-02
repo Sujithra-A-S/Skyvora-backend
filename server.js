@@ -150,9 +150,9 @@ const transporter = nodemailer.createTransport({
 app.post("/enquiry", async (req, res) => {
   try {
     await Enquiry.create(req.body);
-
+    console.log("Saved to MongoDB")
     await transporter.sendMail({
-      from: "Skyvora Trips <skyvoratrips@gmail.com>",
+      from: "Skyvora Trips <{process.env.EMAIL_USER}>",
       to: "skyvoratrips@gmail.com",
       replyTo: req.body.email,
       subject: "New Travel Enquiry",
@@ -168,11 +168,13 @@ app.post("/enquiry", async (req, res) => {
         <p><b>People:</b> ${req.body.people}</p>
       `
     });
+    console.log("Mail Sent")
 
     res.status(200).json({ message: "Enquiry saved and mail sent" });
-  } catch (err) {
-    console.log("Enquiry Error:", err);
-    res.status(500).json({ message: "Something went wrong" });
+  } 
+  catch (err) {
+    console.error("Enquiry Error:", err.message);
+    res.status(500).json({ message: err.message });
   }
 });
 
