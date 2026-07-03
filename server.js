@@ -261,7 +261,7 @@ app.post("/enquiry", async (req, res) => {
     console.log("BODY:",req.body);
     await Enquiry.create(req.body);
     console.log("Database Saved")
-    const mailInfo = await transporter.sendMail({
+      const data = await resend.emails.send({
       from: `"Skyvora Trips" <onboarding@resend.dev>`,
        to:"skyvoratrips@getMaxListeners.com" ,
       replyTo: undefined,
