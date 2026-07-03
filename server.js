@@ -191,7 +191,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
-
+// const nodemailer = require("nodemailer");
 const { Resend } = require("resend");
 const resend = new 
 Resend(process.env.RESEND_API_KEY);
@@ -249,16 +249,22 @@ const Enquiry = mongoose.model("Enquiry", enquirySchema);
 //     rejectUnauthorized: false
 //   }
 // });
-
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS
+//   }
+// });
 app.post("/enquiry", async (req, res) => {
   try {
     console.log("BODY:",req.body);
     await Enquiry.create(req.body);
     console.log("Database Saved")
-    const data = await resend.emails.send({
+    const mailInfo = await transporter.sendMail({
       from: `"Skyvora Trips" <onboarding@resend.dev>`,
-       to:"sujithraas04@gmail.com" ,
-      // replyTo: undefined,
+       to:"skyvoratrips@getMaxListeners.com" ,
+      replyTo: undefined,
       subject: "New Travel Enquiry",
       html: `
         <h2>New Travel Enquiry</h2>
@@ -272,12 +278,10 @@ app.post("/enquiry", async (req, res) => {
         <p><b>People:</b> ${req.body.people}</p>
       `
     });
-    console.log("mail sent:",data);
-  
+     console.log("Mail sent:", mailInfo.messageId);
 
-    
     res.status(200).json({
-      message: "Enquiry submitted successfully. Mail sent to owner."
+      message: "Enquiry submitted successfully"
     });
 
   }catch (err) {
