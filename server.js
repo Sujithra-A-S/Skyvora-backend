@@ -263,7 +263,7 @@ app.post("/enquiry", async (req, res) => {
     console.log("Database Saved")
       const data = await resend.emails.send({
       from: `"Skyvora Trips" <onboarding@resend.dev>`,
-       to:"skyvoratrips@getMaxListeners.com" ,
+       to:"skyvoratrips@gmail.com" ,
       replyTo: undefined,
       subject: "New Travel Enquiry",
       html: `
@@ -278,7 +278,7 @@ app.post("/enquiry", async (req, res) => {
         <p><b>People:</b> ${req.body.people}</p>
       `
     });
-     console.log("Mail sent:", mailInfo.messageId);
+     console.log("Mail sent:", data);
 
     res.status(200).json({
       message: "Enquiry submitted successfully"
