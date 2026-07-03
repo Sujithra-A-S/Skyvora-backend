@@ -258,7 +258,7 @@ app.post("/enquiry", async (req, res) => {
     const data = await resend.emails.send({
       from: `"Skyvora Trips" <onboarding@resend.dev>`,
        to:"assujithra311@gmail.com" ,
-      replyTo: undefined,
+      // replyTo: undefined,
       subject: "New Travel Enquiry",
       html: `
         <h2>New Travel Enquiry</h2>
